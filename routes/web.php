@@ -12,5 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard.issues.issueListing');
 });
+
+Route::get('issue-listing','Dashboard\HomeController@assignStory');
