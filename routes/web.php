@@ -16,8 +16,10 @@ Route::get('/', function () {
 });
 
 Route::prefix('dashboard')->group(function () {
-    Route::get('issue-listing', 'Dashboard\IssuesController@issueListing');
+    Route::post('issue-listing/{step}', 'Dashboard\IssuesController@issueListing');
+    Route::get('import-jira', 'Dashboard\IssuesController@importJira');
 });
+
 
 
 

@@ -7,6 +7,8 @@
         <title>AdminLTE 3 | Fixed Sidebar</title>
         <!-- Tell the browser to be responsive to screen width -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <base href="{{env('APP_URL')}}"/>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- Font Awesome -->
         <link rel="stylesheet" href="{{asset('dashboard/plugins/fontawesome-free/css/all.min.css') }}">
         <!-- Ionicons -->
