@@ -6,6 +6,7 @@
             <name>myjira</name>
         </data>
         <spellchecker-wordlist xmlns="http://www.netbeans.org/ns/spellchecker-wordlist/1">
+            <word>elseif</word>
             <word>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</word>
         </spellchecker-wordlist>
     </configuration>

@@ -78,46 +78,83 @@ class IssuesController extends Controller {
             }
     }
 
-    public function issueListing(Request $request, $step) {
+    public function issueListing(Request $request) {
         $data = [];
         $totalCount = 20;
         Unirest\Request::auth('shantanu.sharma@kreatetechnologies.com', 'vRZLGMKSFuIoUh6DHrbb9E81');
-        switch ($step) {
+        switch ($request->step) {
             case '0':
+//                dd('dd');
                 foreach (['mainTableItem', 'issuetype', 'project', 'assignee', 'issuelinks',] as $value) {
                     DB::table($value)->truncate();
                 }
                 $data['next'] = true;
-                $data['count'] = 1;
-
-                $data['response'] = [];
-                $data['html'] = "";
+                $data['count'] = 0;
+                $data['step']=1;
+                $data['project']=$request->project;
+                $data['response'] = null;
+                $data['title'] = "Database Successfully Refined....";
+                $data['html'] = view('dashboard/issues/recallCheck')->with($data)->toHtml();
                 return response()->json($data);
                 break;
             case '1':
                 $response = Unirest\Request::get(
-                    env('JIRA_APP_DOMAIN') . 'search',
+                                env('JIRA_APP_DOMAIN') . 'search',
                                 ['Accept' => 'application/json'],
                                 [
                                     'jql' => 'project = ' . $request->project . ' AND issuetype = Story ORDER BY priority DESC, updated DESC',
-                                    'maxResults' => $totalCount
+                                    'maxResults' => $totalCount,
+                                    'startAt'=>$request->count,
+                                    
                                 ]
                 );
-                $data['step'] = $step;
+//                dd($response->body);
+                $data['step'] = $request->step;
+                $data['project']=$request->project;
                 $data['count'] = $request->count + $totalCount;
-                $data['next'] = false;
-                if (($data['count'] + $totalCount) < $response->body->total)
+                $data['next'] = true;
+                $data['title'] = "Story Reading....";
+                if (($data['count']) <= $response->body->total)
                     $this->autoRecall($response);
                 else {
-                    $data['step'] = $step + 1;
-                    $data['count'] = $totalCount;
+                    $data['step'] = $request->step + 1;
+                    $data['count'] = 0;
                     $data['next'] = true;
+                    $data['title'] = "Story Successfully Synced....";
                 }
-                $data['response'] = collect($response)->except("issues")->all();
-                $data['html'] = view('dashboard/issues/importJira')->with($data);
+                $data['response'] = collect($response->body)->except("issues")->all();
+                
+                $data['html'] = view('dashboard/issues/recallCheck')->with($data)->toHtml();
+//                echo ($data['html']);die;
                 return response()->json($data);
                 break;
             case '2':
+                $response = Unirest\Request::get(
+                                env('JIRA_APP_DOMAIN') . 'search',
+                                ['Accept' => 'application/json'],
+                                [
+                                    'jql' => 'project = ' . $request->project . ' AND issuetype in (Bug, Epic, Task, "Test Case", Sub-task) ORDER BY priority DESC, updated DESC',
+                                    'maxResults' => $totalCount,
+                                    'startAt'=>$request->count,
+                                ]
+                );
+//                dd($response->body);
+                $data['step'] = $request->step;
+                $data['project']=$request->project;
+                $data['count'] = $request->count + $totalCount;
+                $data['next'] = true;
+                $data['title'] = 'Bug, Epic, Task,Test Case, Sub-task Reading....';
+                if (($data['count']) <= $response->body->total)
+                    $this->autoRecall($response);
+                else {
+                    $data['step'] = $request->step + 1;
+                    $data['count'] = 0;
+                    $data['next'] = false;
+                    $data['title'] = "Bug, Epic, Task,Test Case, Sub-task Successfully Synced....";
+                }
+                $data['response'] = collect($response->body)->except("issues")->all();
+                $data['html'] = view('dashboard/issues/recallCheck')->with($data)->toHtml();
+                return response()->json($data);
 
                 break;
             case '3':
