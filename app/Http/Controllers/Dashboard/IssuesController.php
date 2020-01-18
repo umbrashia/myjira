@@ -11,6 +11,10 @@ use \App\Helpers\GlobalHelper;
 
 class IssuesController extends Controller {
 
+    public function __construct() {
+        Unirest\Request::auth('shantanu.sharma@kreatetechnologies.com', 'vRZLGMKSFuIoUh6DHrbb9E81');
+    }
+
     function autoCreateTable($table, $col, $value) {
         
     }
@@ -78,10 +82,42 @@ class IssuesController extends Controller {
             }
     }
 
-    public function issueListing(Request $request) {
+    public function jiraSyncImporter(Request $request, $inputVar = []) {
         $data = [];
         $totalCount = 20;
         Unirest\Request::auth('shantanu.sharma@kreatetechnologies.com', 'vRZLGMKSFuIoUh6DHrbb9E81');
+        $response = Unirest\Request::get(
+                        env('JIRA_APP_DOMAIN') . 'search',
+                        ['Accept' => 'application/json'],
+                        [
+                            'jql' => 'project = ' . $request->project . ' AND issuetype in (' . $inputVar['issueType'] . ') ORDER BY priority DESC, updated DESC',
+                            'maxResults' => $totalCount,
+                            'startAt' => $request->count,
+                        ]
+        );
+//                dd($response->body);
+        $data['step'] = $request->step;
+        $data['project'] = $request->project;
+        $data['count'] = $request->count + $totalCount;
+        $data['next'] = true;
+        $data['title'] = $inputVar['progressText'];
+        if (($data['count']) <= $response->body->total)
+            $this->autoRecall($response);
+        else {
+            $data['step'] = $request->step + 1;
+            $data['count'] = 0;
+            $data['next'] = true;
+            $data['title'] = $inputVar['successText'];
+        }
+        $data['response'] = collect($response->body)->except("issues")->all();
+
+        $data['html'] = view('dashboard/issues/recallCheck')->with($data)->toHtml();
+//                echo ($data['html']);die;
+        return response()->json($data);
+    }
+
+    public function issueListing(Request $request) {
+
         switch ($request->step) {
             case '0':
 //                dd('dd');
@@ -90,57 +126,38 @@ class IssuesController extends Controller {
                 }
                 $data['next'] = true;
                 $data['count'] = 0;
-                $data['step']=1;
-                $data['project']=$request->project;
+                $data['step'] = 1;
+                $data['project'] = $request->project;
                 $data['response'] = null;
                 $data['title'] = "Database Successfully Refined....";
                 $data['html'] = view('dashboard/issues/recallCheck')->with($data)->toHtml();
                 return response()->json($data);
                 break;
             case '1':
-                $response = Unirest\Request::get(
-                                env('JIRA_APP_DOMAIN') . 'search',
-                                ['Accept' => 'application/json'],
-                                [
-                                    'jql' => 'project = ' . $request->project . ' AND issuetype = Story ORDER BY priority DESC, updated DESC',
-                                    'maxResults' => $totalCount,
-                                    'startAt'=>$request->count,
-                                    
-                                ]
-                );
-//                dd($response->body);
-                $data['step'] = $request->step;
-                $data['project']=$request->project;
-                $data['count'] = $request->count + $totalCount;
-                $data['next'] = true;
-                $data['title'] = "Story Reading....";
-                if (($data['count']) <= $response->body->total)
-                    $this->autoRecall($response);
-                else {
-                    $data['step'] = $request->step + 1;
-                    $data['count'] = 0;
-                    $data['next'] = true;
-                    $data['title'] = "Story Successfully Synced....";
-                }
-                $data['response'] = collect($response->body)->except("issues")->all();
-                
-                $data['html'] = view('dashboard/issues/recallCheck')->with($data)->toHtml();
-//                echo ($data['html']);die;
-                return response()->json($data);
+                return $this->jiraSyncImporter($request, [
+                            "progressText" => "Epic is reading....",
+                            "successText" => "Epic is successfully synced...",
+                            "issueType" => "Epic"
+                ]);
                 break;
             case '2':
+                return $this->jiraSyncImporter($request, [
+                            "progressText" => "Task is reading....",
+                            "successText" => "Task is successfully synced...",
+                            "issueType" => "Task"
+                ]);
                 $response = Unirest\Request::get(
                                 env('JIRA_APP_DOMAIN') . 'search',
                                 ['Accept' => 'application/json'],
                                 [
                                     'jql' => 'project = ' . $request->project . ' AND issuetype in (Bug, Epic, Task, "Test Case", Sub-task) ORDER BY priority DESC, updated DESC',
                                     'maxResults' => $totalCount,
-                                    'startAt'=>$request->count,
+                                    'startAt' => $request->count,
                                 ]
                 );
 //                dd($response->body);
                 $data['step'] = $request->step;
-                $data['project']=$request->project;
+                $data['project'] = $request->project;
                 $data['count'] = $request->count + $totalCount;
                 $data['next'] = true;
                 $data['title'] = 'Bug, Epic, Task,Test Case, Sub-task Reading....';
@@ -169,6 +186,21 @@ class IssuesController extends Controller {
 
         echo dd($response->body);
 //        return view()
+    }
+
+    public function getCountIssues(Request $request) {
+        $response = Unirest\Request::get(
+                        env('JIRA_APP_DOMAIN') . 'search',
+                        ['Accept' => 'application/json'],
+                        [
+                            'jql' => 'project = ' . $request->project . ' AND issuetype in (' . $request->issueType . ') ORDER BY priority DESC, updated DESC',
+                            'maxResults' => 0,
+                            'startAt'=>0
+                        ]
+        );
+        $data['response'] = collect($response->body)->except("issues")->all();
+//        $data['response'] = $response->body;
+        return response()->json($data);
     }
 
     //

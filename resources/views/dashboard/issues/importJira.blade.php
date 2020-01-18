@@ -89,35 +89,55 @@
     var importDataEngine = {
         step: 0,
         count: 0,
-        project: "",
+        project: "BIL",
         next: null,
         html: ""
     };
-    var temp=importDataEngine;
-
+    var temp = importDataEngine;
+//-------
+    var total = 143;//14
+    var countApi = 0;
+    var dividerCount = 20;
     function recallData() {
+
+
+        importDataEngine.count = (countApi++) * dividerCount;
         $.post("dashboard/issue-listing", importDataEngine, function (res) {
 //            console.log(res)
 //            debugger;
-            importDataEngine = res;
-            $('.timeline').append(importDataEngine.html);
+//            importDataEngine = res;
+            $('.timeline').append(res.html);
 //            $(document).animate({scrollTop: }, 1000);
-            if (importDataEngine.next)
-                recallData();
-            else{
+            if (importDataEngine.next) {
+
+            } else {
                 $(".myJiraLoader").fadeOut();
-                importDataEngine=temp;
-                
+                importDataEngine = temp;
+
             }
+            if ((countApi) <= Math.round((total) / dividerCount)) {
+                console.log((countApi) + "/" + Math.round((total + dividerCount) / dividerCount));
+                recallData();
+                if ((countApi) == Math.round((total) / dividerCount)) {
+                    importDataEngine = res;
+                    doEventDataRecall(null);
+                }
+            }
+
             $(document).scrollTop($(document).height());
         });
         $(".myJiraLoader").fadeIn();
+
     }
 
     function doEventDataRecall(This) {
-        $(This).prop('disabled',true).text("...");
+        if (This)
+            $(This).prop('disabled', true).text("...");
         importDataEngine.project = $('#projectSelect').val();
-        recallData();
+        for (var i = 1; i <= 10; i = i + 1) {
+            if (Math.round((total + dividerCount) / dividerCount) > i)
+                recallData();
+        }
     }
 
 </script>
