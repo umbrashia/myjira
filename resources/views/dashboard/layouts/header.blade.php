@@ -64,7 +64,7 @@
                  alt="jira"
                  class="brand-image img-circle elevation-3"
                  style="opacity: .8">
-            <span class="brand-text font-weight-light">Agenda 21</span>
+            <span class="brand-text font-weight-light">Jira Management</span>
         </a>
 
         <!-- Sidebar -->
@@ -86,7 +86,7 @@
                          with font-awesome or any other icon font library -->
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon  fas fa-skull-crossbones"></i>
+                            <i class="nav-icon  fas fa-file-import"></i>
 
                             <p>
                                 Issues Importer
@@ -103,20 +103,15 @@
                             <li class="nav-item">
                                 <a href="../../index2.html" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Dashboard v2</p>
+                                    <p>Import Worklog</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="../../index3.html" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Dashboard v3</p>
-                                </a>
-                            </li>
+                            
                         </ul>
                     </li>
                     <li class="nav-item has-treeview">
                         <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-biohazard"></i>
+                            <i class="nav-icon fas fa-carrot"></i>
                             <p>
                                 Issue Management
                                 <i class="right fas fa-angle-left"></i>
@@ -126,21 +121,10 @@
                             <li class="nav-item">
                                 <a href="../../index.html" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Import Issues</p>
+                                    <p>Issues Listing</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a href="../../index2.html" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Dashboard v2</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="../../index3.html" class="nav-link">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Dashboard v3</p>
-                                </a>
-                            </li>
+                            
                         </ul>
                     </li>
                     <li class="nav-header">Reports</li>

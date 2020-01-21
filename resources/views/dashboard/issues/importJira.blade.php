@@ -12,7 +12,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Jira Import Management</li>
+                    <li class="breadcrumb-item active">Fixed Layout</li>
                 </ol>
             </div>
         </div>
@@ -89,55 +89,35 @@
     var importDataEngine = {
         step: 0,
         count: 0,
-        project: "BIL",
+        project: "",
         next: null,
         html: ""
     };
-    var temp = importDataEngine;
-//-------
-    var total = 143;//14
-    var countApi = 0;
-    var dividerCount = 20;
+    var temp=importDataEngine;
+
     function recallData() {
-
-
-        importDataEngine.count = (countApi++) * dividerCount;
         $.post("dashboard/issue-listing", importDataEngine, function (res) {
 //            console.log(res)
 //            debugger;
-//            importDataEngine = res;
-            $('.timeline').append(res.html);
+            importDataEngine = res;
+            $('.timeline').append(importDataEngine.html);
 //            $(document).animate({scrollTop: }, 1000);
-            if (importDataEngine.next) {
-
-            } else {
-                $(".myJiraLoader").fadeOut();
-                importDataEngine = temp;
-
-            }
-            if ((countApi) <= Math.round((total) / dividerCount)) {
-                console.log((countApi) + "/" + Math.round((total + dividerCount) / dividerCount));
+            if (importDataEngine.next)
                 recallData();
-                if ((countApi) == Math.round((total) / dividerCount)) {
-                    importDataEngine = res;
-                    doEventDataRecall(null);
-                }
+            else{
+                $(".myJiraLoader").fadeOut();
+                importDataEngine=temp;
+                
             }
-
             $(document).scrollTop($(document).height());
         });
         $(".myJiraLoader").fadeIn();
-
     }
 
     function doEventDataRecall(This) {
-        if (This)
-            $(This).prop('disabled', true).text("...");
+        $(This).prop('disabled',true).text("...");
         importDataEngine.project = $('#projectSelect').val();
-        for (var i = 1; i <= 10; i = i + 1) {
-            if (Math.round((total + dividerCount) / dividerCount) > i)
-                recallData();
-        }
+        recallData();
     }
 
 </script>
