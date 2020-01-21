@@ -95,7 +95,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="../../index.html" class="nav-link">
+                                <a href="{{url('dashboard/issues/import-jira')}}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Import Issues</p>
                                 </a>
@@ -119,7 +119,7 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="../../index.html" class="nav-link">
+                                <a href="{{url('dashboard/issues/issues-listing')}}" class="nav-link">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Issues Listing</p>
                                 </a>

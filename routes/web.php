@@ -16,9 +16,12 @@ Route::get('/', function () {
 });
 
 Route::prefix('dashboard')->group(function () {
-    Route::post('issue-listing', 'Dashboard\Issues\IssuesController@issueListing');
-    Route::get('import-jira', 'Dashboard\Issues\IssuesController@importJira');
-    Route::get('get-count-issues', 'Dashboard\Issues\IssuesController@getCountIssues');
+    Route::prefix('issues')->group(function () {
+        Route::post('issue-import', 'Dashboard\Issues\IssuesController@issueImport');
+        Route::get('import-jira', 'Dashboard\Issues\IssuesController@importJira');
+        Route::get('get-count-issues', 'Dashboard\Issues\IssuesController@getCountIssues');
+        Route::get('issues-listing', 'Dashboard\Issues\IssuesManagementController@geIssuesListing');
+    });
 });
 
 

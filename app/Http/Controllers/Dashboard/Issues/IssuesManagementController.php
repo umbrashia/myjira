@@ -7,5 +7,9 @@ use Illuminate\Http\Request;
 
 class IssuesManagementController extends Controller
 {
+    public function geIssuesListing(Request $request) {
+        $data=[];
+        return view('dashboard/issues/issueListing')->with($data);
+    }
     //
 }

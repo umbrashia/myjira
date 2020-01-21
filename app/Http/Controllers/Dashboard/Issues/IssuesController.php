@@ -121,7 +121,7 @@ class IssuesController extends Controller {
         return response()->json($data);
     }
 
-    public function issueListing(Request $request) {
+    public function issueImport(Request $request) {
 
         switch ($request->step) {
             case '0':

@@ -96,7 +96,7 @@
     var temp=importDataEngine;
 
     function recallData() {
-        $.post("dashboard/issue-listing", importDataEngine, function (res) {
+        $.post("dashboard/issues/issue-import", importDataEngine, function (res) {
 //            console.log(res)
 //            debugger;
             importDataEngine = res;
