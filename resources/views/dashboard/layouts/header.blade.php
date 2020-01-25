@@ -60,11 +60,11 @@
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
         <a href="../../index3.html" class="brand-link">
-            <img src="dashboard/dist/img/jira.svg"
+            <img src="{{asset('dashboard/dist/img/logo.jpeg')}}"
                  alt="jira"
                  class="brand-image img-circle elevation-3"
                  style="opacity: .8">
-            <span class="brand-text font-weight-light">Jira Management</span>
+            <span class="brand-text font-weight-light">First Order (66)</span>
         </a>
 
         <!-- Sidebar -->
@@ -75,7 +75,7 @@
                     <img src="{{asset('dashboard/dist/img/shantanu.png')}}" class="img-circle elevation-2" alt="User Image">
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">Shantanu</a>
+                    <a href="#" class="d-block">Shantanu Sharma</a>
                 </div>
             </div>
 

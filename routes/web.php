@@ -21,6 +21,7 @@ Route::prefix('dashboard')->group(function () {
         Route::get('import-jira', 'Dashboard\Issues\IssuesController@importJira');
         Route::get('get-count-issues', 'Dashboard\Issues\IssuesController@getCountIssues');
         Route::get('issues-listing', 'Dashboard\Issues\IssuesManagementController@geIssuesListing');
+        Route::get('view-issue/{id}', 'Dashboard\Issues\IssuesManagementController@viewIssue');
     });
 });
 

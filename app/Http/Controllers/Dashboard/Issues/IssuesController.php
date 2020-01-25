@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\IssuesModel;
 use \App\Helpers\GlobalHelper;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Storage;
 
 class IssuesController extends Controller {
@@ -22,8 +23,9 @@ class IssuesController extends Controller {
     }
 
     public function importJira(Request $request) {
-        
-//        dd(Carbon::parse("2019-12-02T14:54:14.846+0530")->format('Y-m-d H:i:s'));
+        $date = "2019-11-28T17:13:44.593+0530";
+        $fff = null;
+//        dd(($fff??Carbon::parse($date)->format('Y-m-d H:i:s')));
         $data = [];
         Unirest\Request::auth('shantanu.sharma@kreatetechnologies.com', 'vRZLGMKSFuIoUh6DHrbb9E81');
         $response = Unirest\Request::get(
@@ -56,8 +58,21 @@ class IssuesController extends Controller {
                                 collect($value->fields->reporter)->filter()->only(GlobalHelper::getAllColsFromTbl("assignee", ""))->all()
                         );
                 }
-                $value->{'issue_type'} = $value->fields->issuetype->name;
-                $value->{'created'}=Carbon::parse($value->fields->created)->format('Y-m-d H:i:s');
+                $issue_type = $value->{'issue_type'} = $value->fields->issuetype->name;
+                if ($issue_type == "Sub-task" && !empty($value->fields->summary))
+                    foreach (['testing', 'release management', 'project management', 'coding', 'code review', 'estimation','impact',] as $subTypes)
+                        if (Str::contains(Str::limit($value->fields->summary, 21), [$subTypes]))
+                            $value->{'subtask_type'} = Str::snake($subTypes);
+                if (!empty($value->fields->customfield_10180))
+                    $value->{'actual_end_date'} = @Carbon::parse($value->fields->customfield_10180)->format('Y-m-d H:i:s');
+                if (!empty($value->fields->customfield_10179))
+                    $value->{'actual_start_date'} = @Carbon::parse($value->fields->customfield_10179)->format('Y-m-d H:i:s');
+                if (!empty($value->fields->created))
+                    $value->fields->{'created'} = @Carbon::parse($value->fields->created)->format('Y-m-d H:i:s');
+                if (!empty($value->fields->updated))
+                    $value->fields->{'updated'} = @Carbon::parse($value->fields->updated)->format('Y-m-d H:i:s');
+//                \Illuminate\Support\Facades\Log::info($value->{'created'});
+//                dd(collect($value)->except(['fields'])->merge($value->fields)->filter());
                 $issue_id = DB::table("mainTableItem")->insertGetId(
                         collect($value)->except(['fields'])->merge($value->fields)->filter()->only(\App\Helpers\GlobalHelper::getAllColsFromTbl("mainTableItem", ""))->all()
                 );
@@ -69,11 +84,13 @@ class IssuesController extends Controller {
                 }
                 if (!in_array(@$value->issue_type, ['Story']) && @$value->fields->issuelinks) {
 //                \Illuminate\Support\Facades\Log::debug($value->fields->issuelinks);
-                    collect($value->fields->issuelinks)->map(function($inner)use($issue_id) {
+                    collect($value->fields->issuelinks)->map(function($inner)use($issue_id, $issue_type) {
                         $insertData = (empty($inner->outwardIssue)) ? $inner->inwardIssue : $inner->outwardIssue;
                         $row = IssuesModel::where(['key' => $insertData->key])->first();
                         if (@$row->main_issue_id) {
-                            $insertData->{'issue_id'} = $row->main_issue_id;
+                            $insertData->{'linked_id'} = $row->main_issue_id;
+                            $insertData->{'issue_id'} = $issue_id;
+                            $insertData->{'issue_type'} = $issue_type;
                             DB::table("issuelinks")->insert(collect($insertData)->merge($insertData->fields)->only(\App\Helpers\GlobalHelper::getAllColsFromTbl("issuelinks", ""))->all());
                         }
                     });
@@ -81,7 +98,9 @@ class IssuesController extends Controller {
                 if (@$value->fields->parent) {
                     $row = IssuesModel::where(['key' => $value->fields->parent->key])->first();
                     if (@$row->main_issue_id)
-                        $value->fields->parent->{'issue_id'} = $row->main_issue_id;
+                        $value->fields->parent->{'linked_id'} = $row->main_issue_id;
+                    $value->fields->parent->{'issue_id'} = $issue_id;
+                    $value->fields->parent->{'issue_type'} = $issue_type;
                     DB::table("issuelinks")->insert(collect($value->fields->parent)->merge($value->fields->parent->fields)->only(\App\Helpers\GlobalHelper::getAllColsFromTbl("issuelinks", ""))->all());
                 }
             }
@@ -106,7 +125,7 @@ class IssuesController extends Controller {
         $data['count'] = $request->count + $totalCount;
         $data['next'] = true;
         $data['title'] = $inputVar['progressText'];
-        if (($data['count']) <= ($response->body->total+ $totalCount))
+        if (($data['count']) <= ($response->body->total + $totalCount))
             $this->autoRecall($response);
         else {
             $data['step'] = $request->step + 1;
@@ -126,7 +145,7 @@ class IssuesController extends Controller {
         switch ($request->step) {
             case '0':
 //                dd('dd');
-                foreach (['temp_jira_data','mainTableItem', 'issuetype', 'project', 'assignee', 'issuelinks',] as $value) {
+                foreach (['temp_jira_data', 'mainTableItem', 'issuetype', 'project', 'assignee', 'issuelinks',] as $value) {
                     DB::table($value)->truncate();
                 }
                 $data['next'] = true;
@@ -140,46 +159,46 @@ class IssuesController extends Controller {
                 break;
             case '1':
                 return $this->jiraSyncImporter($request, [
-                            "progressText" => 'Bug, Epic, Story, Task, Test Case & Sub-task is reading....',
-                            "successText" => "Bug, Epic, Story, Task, Test Case & Sub-task is successfully synced...",
-                            "issueType" => 'Bug, Epic, Story, Task, "Test Case", Sub-task'
+                            "progressText" => 'Epic\'s is reading....',
+                            "successText" => "Epic\'s is successfully synced...",
+                            "issueType" => 'Epic'
                 ]);
                 break;
             case '2':
-                return response()->json(['next' => false]);
-//                return $this->jiraSyncImporter($request, [
-//                            "progressText" => "Story is reading....",
-//                            "successText" => "Story is successfully synced...",
-//                            "issueType" => "Story"
-//                ]);
+//                return response()->json(['next' => false]);
+                return $this->jiraSyncImporter($request, [
+                            "progressText" => "Story is reading....",
+                            "successText" => "Story is successfully synced...",
+                            "issueType" => "Story"
+                ]);
                 break;
             case '3':
-//                return $this->jiraSyncImporter($request, [
-//                            "progressText" => "Task is reading....",
-//                            "successText" => "Task is successfully synced...",
-//                            "issueType" => "Task"
-//                ]);
+                return $this->jiraSyncImporter($request, [
+                            "progressText" => "Task is reading....",
+                            "successText" => "Task is successfully synced...",
+                            "issueType" => "Task"
+                ]);
                 break;
             case '4':
-//                return $this->jiraSyncImporter($request, [
-//                            "progressText" => "Sub-task is reading....",
-//                            "successText" => "Sub-task is successfully synced...",
-//                            "issueType" => "Sub-task"
-//                ]);
+                return $this->jiraSyncImporter($request, [
+                            "progressText" => "Sub-task is reading....",
+                            "successText" => "Sub-task is successfully synced...",
+                            "issueType" => "Sub-task"
+                ]);
                 break;
             case '5':
-//                return $this->jiraSyncImporter($request, [
-//                            "progressText" => "Test Case is reading....",
-//                            "successText" => "Test Case is successfully synced...",
-//                            "issueType" => '"Test Case"'
-//                ]);
-//                break;
+                return $this->jiraSyncImporter($request, [
+                            "progressText" => "Test Case is reading....",
+                            "successText" => "Test Case is successfully synced...",
+                            "issueType" => '"Test Case"'
+                ]);
+                break;
             case '6':
-//                 return $this->jiraSyncImporter($request, [
-//                            "progressText" => "Bug Case is reading....",
-//                            "successText" => "Bug Case is successfully synced...",
-//                            "issueType" => 'Bug'
-//                ]);
+                return $this->jiraSyncImporter($request, [
+                            "progressText" => "Bug Case is reading....",
+                            "successText" => "Bug Case is successfully synced...",
+                            "issueType" => 'Bug'
+                ]);
                 break;
             case '7':
                 return response()->json(['next' => false]);
@@ -200,6 +219,7 @@ class IssuesController extends Controller {
             '0' => 'machine',
             '1' => 'Bug, Epic, Story, Task, "Test Case", Sub-task',
             '2' => 'Story, Bug',
+            '3'=>'Bug',
         ];
         if (in_array($request->step, ['0']))
             return response()->json(['total' => 1]);
@@ -236,13 +256,13 @@ class IssuesController extends Controller {
         $data['count'] = $request->count + $totalCount;
         $data['next'] = true;
         $data['title'] = $inputVar['progressText'];
-        
+
         if (($data['count']) <= $response->body->total)
-            collect($response->body->issues)->map(function($ar){
+            collect($response->body->issues)->map(function($ar) {
                 DB::table("temp_jira_data")->insert([
-                    "issuetype"=>$ar->fields->issuetype->name,
-                    'created'=>Carbon::parse($ar->fields->created)->format('Y-m-d H:i:s'),
-                    'jira_data_json'=> collect($ar)->toJson()
+                    "issuetype" => $ar->fields->issuetype->name,
+                    'created' => Carbon::parse($ar->fields->created)->format('Y-m-d H:i:s'),
+                    'jira_data_json' => collect($ar)->toJson()
                 ]);
             });
         else {
