@@ -1,7 +1,7 @@
 
 @extends('dashboard.layouts.master')
 @section('styles')
-<!--<link rel="stylesheet" href="{{ asset('dashboard/plugins/datatables-bs4/css/dataTables.bootstrap4.css')}}">-->
+<link rel="stylesheet" href="{{ asset('dashboard/plugins/datatables-bs4/css/dataTables.bootstrap4.css')}}">
 @endsection
 @section('content')
 <section class="content-header">
@@ -75,7 +75,7 @@
 
         <div class="card card-default">
             <div class="card-header">
-                <h3 class="card-title">{{$issue->key}}</h3>
+                <h3 class="card-title">{{$issue->key}} Sub-Task</h3>
 
                 <div class="card-tools">
                     <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -95,14 +95,20 @@
 //                                    'expand',
 //                                    'id',
 //                                    'self',
-                                'key',
+//                                'key',
                                 'summary',
 //                                    'issue_type',
                                 'timespent',
 //                                    'aggregatetimespent',
 //                                    'workratio',
-                                'created',
+//                                'created',
                                 'timeestimate',
+//                                'story_point',
+                                'start_date',
+                                'duedate',
+                                'actual_start_date',
+                                'actual_end_date',
+                                
 //                                    'updated',
 //                                    'customfield_10011',
 //                                    'aggregatetimeestimate',
@@ -119,11 +125,11 @@
                     </thead>
                     <tbody>
                         <?php 
-                        
-                        foreach ($issue->getLinkedIssue()->where('issue_type','Sub Task') as $value) { ?>
+//                        dd($issue->getLinkedIssue()->where('issue_type','Sub-task')->get());
+                        foreach ($issue->getLinkedIssue()->where('issue_type','Sub-task')->get() as $value) { ?>
                             <tr>
                                 <?php foreach ($cols as $val) { ?>
-                                    <td><?php echo $value->{$val}; ?></td>
+                                    <td><?php echo $value->getIssue()->first()->{$val}; ?></td>
                                 <?php } ?>
                                 <td><a href="{{url('dashboard/issues/view-issue',$value->main_issue_id)}}"><i class="fas fa-pencil-alt"></i></a></td>
                             </tr>
@@ -158,6 +164,7 @@ $(function () {
         "ordering": true,
         "info": true,
         "autoWidth": true,
+        "pageLength": 50
     });
 });
 </script>

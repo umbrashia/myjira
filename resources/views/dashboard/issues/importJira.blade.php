@@ -49,7 +49,7 @@
                                     <label for="exampleInputEmail1">Choose Project</label>
                                     <select class="form-control" id="projectSelect">
                                         @foreach ($projects as $pro)                                        
-                                        <option value="{{$pro->key}}">{{$pro->name}}</option>
+                                        <option value="{{$pro['key']}}">{{$pro['name']}}</option>
                                         @endforeach
                                     </select>
                                 </div>
