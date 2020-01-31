@@ -28,7 +28,13 @@ class IssuesManagementController extends Controller {
     public function viewIssue(Request $request,$id) {
         $data = [];
         $data['issue']=IssuesModel::findOrFail($id);
-//        dd($data['issues'][0]->created);
+        
+        $data['subIssues']=$data['issue']->getLinkedIssue()->select('mainTableItem.*')
+                ->rightJoin('mainTableItem','issuelinks.issue_id','=','mainTableItem.main_issue_id')
+                ->whereIn("mainTableItem.subtask_type",['testing', 'release management', 'project management', 'coding', 'code review', 'estimation', 'impact',])
+                ->get();
+//        throw "error";
+//        dd($joinData);
         
         return view('dashboard/issues/viewIssue')->with($data);
     }

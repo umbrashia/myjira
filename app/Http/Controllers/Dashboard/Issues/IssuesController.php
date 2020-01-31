@@ -65,7 +65,7 @@ class IssuesController extends Controller {
                 $value['bug_type'] = Arr::get($value, "fields.customfield_10177.value");
                 if ($issue_type == "Sub-task" )
                     foreach (['testing', 'release management', 'project management', 'coding', 'code review', 'estimation', 'impact',] as $subTypes)
-                        if (Str::contains($value['fields']['summary'], $subTypes))
+                        if (Str::contains(strtolower($value['fields']['summary']), $subTypes))
                             $value['subtask_type'] = $subTypes;
                 if (!empty($value['fields']['customfield_10180']))
                     $value['actual_end_date'] = @Carbon::parse($value['fields']['customfield_10180'])->format('Y-m-d H:i:s');

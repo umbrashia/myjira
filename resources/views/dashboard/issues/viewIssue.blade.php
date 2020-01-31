@@ -96,19 +96,18 @@
 //                                    'id',
 //                                    'self',
 //                                'key',
-                                'summary',
+                                "summary" => 'summary',
 //                                    'issue_type',
-                                'timespent',
+                                "timespent" => 'timespent',
 //                                    'aggregatetimespent',
 //                                    'workratio',
 //                                'created',
-                                'timeestimate',
+                                "estimate" => 'timeestimate',
 //                                'story_point',
-                                'start_date',
-                                'duedate',
-                                'actual_start_date',
-                                'actual_end_date',
-                                
+                                "start" => 'start_date',
+                                "duedate" => 'duedate',
+                                "a_s_date" => 'actual_start_date',
+                                "a_e_date" => 'actual_end_date',
 //                                    'updated',
 //                                    'customfield_10011',
 //                                    'aggregatetimeestimate',
@@ -116,23 +115,26 @@
 //                                    'assignee_id',
 //                                    'reporter_id',
                             );
-                            foreach ($cols as $val) {
+                            foreach ($cols as $key => $val) {
                                 ?>
-                                <th>{{$val}}</th>
+                                <th>{{$key}}</th>
                             <?php } ?>
-                            <th>Action</th>
+<!--<th>Action</th>-->
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
+                        <?php
 //                        dd($issue->getLinkedIssue()->where('issue_type','Sub-task')->get());
-                        foreach ($issue->getLinkedIssue()->where('issue_type','Sub-task')->get() as $value) { ?>
-                            <tr>
-                                <?php foreach ($cols as $val) { ?>
-                                    <td><?php echo $value->getIssue()->first()->{$val}; ?></td>
-                                <?php } ?>
-                                <td><a href="{{url('dashboard/issues/view-issue',$value->main_issue_id)}}"><i class="fas fa-pencil-alt"></i></a></td>
-                            </tr>
+                        foreach ($subIssues as $value) {
+                            ?>
+                            
+                                <tr> 
+                                    <?php foreach ($cols as $val) { ?>
+                                        <td><?php echo $value->{$val}; ?></td>
+                                    <?php } ?>
+        <!--<td><a href="{{url('dashboard/issues/view-issue',$value->main_issue_id)}}"><i class="fas fa-pencil-alt"></i></a></td>-->
+                                </tr>
+                            
                         <?php } ?>
                     </tbody>
                 </table>

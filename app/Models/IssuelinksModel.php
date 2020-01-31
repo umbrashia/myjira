@@ -10,7 +10,7 @@ class IssuelinksModel extends Model
     protected $primaryKey = "auto_id";
     
     function getIssue(){
-        return $this->hasOne('App\Models\IssuesModel','main_issue_id','issue_id');//->whereIn("summary",['testing', 'release management', 'project management', 'coding', 'code review', 'estimation', 'impact',]);
+        return $this->belongsTo('App\Models\IssuesModel','issue_id','main_issue_id')->whereIn("subtask_type",['testing', 'release management', 'project management', 'coding', 'code review', 'estimation', 'impact',]);
     }
     //
 }
