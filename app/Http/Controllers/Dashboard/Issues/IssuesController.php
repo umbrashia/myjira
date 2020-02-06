@@ -25,6 +25,8 @@ class IssuesController extends Controller {
     }
 
     public function importJira(Request $request) {
+        /* $user = User::firstOrCreate(['email' => 'povilas@laraveldaily.com'], 
+          ['first_name' => 'Povilas', 'last_name' => 'Korop']); */
         $date = "2019-11-28T17:13:44.593+0530";
         $fff = null;
 //        dd(($fff??Carbon::parse($date)->format('Y-m-d H:i:s')));
@@ -61,12 +63,15 @@ class IssuesController extends Controller {
                         );
                 }
                 $issue_type = $value['issue_type'] = $value['fields']['issuetype']['name'];
+                $value['issue_type_id'] = \App\Models\IssueTypeModel::firstOrCreate(["name" => $value['fields']['issuetype']['name']], collect($value['fields']['issuetype'])->filter()->only(GlobalHelper::getAllColsFromTbl("issuetype", ""))->all())->auto_id;
                 $value['issue_status'] = Arr::get($value, "fields.status.name");
                 $value['bug_type'] = Arr::get($value, "fields.customfield_10177.value");
-                if ($issue_type == "Sub-task" )
-                    foreach (['testing', 'release management', 'project management', 'coding', 'code review', 'estimation', 'impact',] as $subTypes)
+                if (Arr::has($value, "fields.customfield_10177.value"))
+                    $value['bug_type_id'] = \App\Models\BugTypeModel::firstOrCreate(['value' => Arr::get($value, "fields.customfield_10177.value")], collect($value['fields']['customfield_10177'])->filter()->only(GlobalHelper::getAllColsFromTbl("bugType", ""))->all())->auto_id;
+                if ($issue_type == "Sub-task")
+                    foreach (['project management', 'estimation', 'impact', 'coding', 'code review', 'release management', 'testing',] as $subTaskKey => $subTypes)
                         if (Str::contains(strtolower($value['fields']['summary']), $subTypes))
-                            $value['subtask_type'] = $subTypes;
+                            list($value['subtask_type'], $value['subtask_type_order']) = [Str::snake($subTypes), ++$subTaskKey];
                 if (!empty($value['fields']['customfield_10180']))
                     $value['actual_end_date'] = @Carbon::parse($value['fields']['customfield_10180'])->format('Y-m-d H:i:s');
                 if (!empty($value['fields']['customfield_10179']))
@@ -81,17 +86,15 @@ class IssuesController extends Controller {
                     $value['fields']['duedate'] = @Carbon::parse($value['fields']['duedate'])->format('Y-m-d H:i:s');
                 if (!empty($value['fields']['customfield_10014']))
                     $value['fields']['story_point'] = $value['fields']['customfield_10014'];
-//                \Illuminate\Support\Facades\Log::info($value['created']);
-//                dd(collect($value)->except(['fields'])->merge($value['fields'])->filter());
+                if (Arr::has($value, "fields.project"))
+                    $value['project_id'] = \App\Models\ProjectModel::firstOrCreate(
+                                    ["id" => $value['fields']['project']['id']]
+                                    , collect($value['fields']['project'])->filter()->only(GlobalHelper::getAllColsFromTbl("project", ""))->all())->auto_id;
+
                 $issue_id = DB::table("mainTableItem")->insertGetId(
                         collect($value)->except(['fields'])->merge($value['fields'])->filter()->only(\App\Helpers\GlobalHelper::getAllColsFromTbl("mainTableItem", ""))->all()
                 );
-                if (Arr::has($value, "fields.project")) {
-                    $value['fields']['project']['issue_id'] = $issue_id;
-                    DB::table("project")->insert(
-                            collect($value['fields']['project'])->filter()->only(\App\Helpers\GlobalHelper::getAllColsFromTbl("project", ""))->all()
-                    );
-                }
+
                 if (Arr::has($value, "fields.issuelinks")) {
 //                \Illuminate\Support\Facades\Log::debug($value['fields']['issuelinks']);
                     collect($value['fields']['issuelinks'])->map(function($inner)use($issue_id, $issue_type) {
@@ -154,7 +157,7 @@ class IssuesController extends Controller {
         switch ($request->step) {
             case '0':
 //                dd('dd');
-                foreach (['temp_jira_data', 'mainTableItem', 'issuetype', 'project', 'assignee', 'issuelinks',] as $value) {
+                foreach (['temp_jira_data', 'mainTableItem', 'issuetype', 'project', /* 'assignee', */ 'issuelinks',] as $value) {
                     DB::table($value)->truncate();
                 }
                 $data['next'] = true;
@@ -227,7 +230,7 @@ class IssuesController extends Controller {
         $steps = [
             '0' => 'machine',
             '1' => 'Bug, Epic, Story, Task, "Test Case", Sub-task',
-            '2' => 'Story, Bug',
+            '2' => 'Story',
             '3' => 'Bug',
         ];
         if (in_array($request->step, ['0']))
@@ -238,8 +241,9 @@ class IssuesController extends Controller {
                         ['Accept' => 'application/json'],
                         [
                             'jql' => 'project = ' . env("JIRA_PROJECT_KEY") . ' AND issuetype in (' . $steps[$request->step] . ') ORDER BY priority DESC, updated DESC',
-                            'maxResults' => 20,
-                            'startAt' => 0
+                            'maxResults' => 10,
+                            'startAt' => 0,
+//                            'expand'=>'changelog',
                         ]
         );
 //        $data['total'] = $response->body->total; //collect($response->body)->except("issues")->all();

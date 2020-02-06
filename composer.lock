@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1cb884f272569548956c9e8d45d8a138",
+    "content-hash": "bb9a80fef2c9d3d589ee4c8c49a69ca9",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -3396,6 +3396,49 @@
                 "test"
             ],
             "time": "2016-01-20T08:20:44+00:00"
+        },
+        {
+            "name": "kylekatarnls/carbonite",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kylekatarnls/carbonite.git",
+                "reference": "5c67df8f2714e387f6ae687c51fdfd76374c68bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kylekatarnls/carbonite/zipball/5c67df8f2714e387f6ae687c51fdfd76374c68bc",
+                "reference": "5c67df8f2714e387f6ae687c51fdfd76374c68bc",
+                "shasum": ""
+            },
+            "require": {
+                "nesbot/carbon": "^2.24.0-beta.1",
+                "php": "^7.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.15.0",
+                "phpmd/phpmd": "^2.7.0",
+                "phpstan/phpstan": "^0.11.0",
+                "phpunit/phpunit": "^8.3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "KyleKatarn",
+                    "email": "carbon@selfbuild.fr"
+                }
+            ],
+            "description": "Freeze, accelerate, slow down time and many more with Carbon.",
+            "time": "2019-08-25T12:07:58+00:00"
         },
         {
             "name": "mockery/mockery",

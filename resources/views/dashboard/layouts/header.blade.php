@@ -59,12 +59,13 @@
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a href="../../index3.html" class="brand-link">
-            <img src="{{asset('dashboard/dist/img/logo.jpeg')}}"
+        <a href="../../index3.html" class="brand-link"><!--img-circle elevation-3-->
+            <img src="{{asset('dashboard/dist/img/jira.png')}}"
                  alt="jira"
-                 class="brand-image img-circle elevation-3"
+                 
+                 class="brand-image  "
                  style="opacity: .8">
-            <span class="brand-text font-weight-light">First Order (66)</span>
+            <span class="brand-text font-weight-light">AGENDA 21</span>
         </a>
 
         <!-- Sidebar -->

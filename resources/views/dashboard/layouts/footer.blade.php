@@ -2,7 +2,7 @@
     <div class="float-right d-none d-sm-block">
         <b>Version</b> 3.0.1
     </div>
-    <strong>Copyright &copy; 2019-<?php echo date('Y') ?> <a href="http://adminlte.io">AdminLTE.io</a>.</strong> All rights
+    <strong>Copyright &copy; 2019-<?php echo date('Y') ?> <a href="https://umbrashia.github.io/shantanu-sharma-cv/">Shantanu Sharma (Umbrashia Corporation)</a>.</strong> All rights
     reserved.
 </footer>
 <!-- Control Sidebar -->
