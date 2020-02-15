@@ -58,7 +58,7 @@
                                     ?>
                                     <th>{{$val}}</th>
                                 <?php } ?>
-                                    <th>Action</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,7 +67,23 @@
                                     <?php foreach ($cols as $val) { ?>
                                         <td><?php echo $value->{$val}; ?></td>
                                     <?php } ?>
-                                        <td><a href="{{url('dashboard/issues/view-issue',$value->main_issue_id)}}"><i class="fas fa-pencil-alt"></i></a></td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a type="button" class="btn btn-warning" href="{{url('dashboard/issues/view-issue',$value->main_issue_id)}}"><i class="fas fa-pencil-alt"></i></a>
+                                            <button type="button" class="btn btn-warning dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                                <div class="dropdown-menu" role="menu">
+                                                    <a class="dropdown-item text-danger" href="{{url('dashboard/issues/issue-action',$value->main_issue_id)}}"><i class="fas fa-street-view"></i> Issue Action</a>
+<!--                                                    <a class="dropdown-item" href="#"><i class="nav-icon fab fa-phoenix-framework"></i></a>
+                                                    <a class="dropdown-item" href="#"><i class="nav-icon fab fa-phoenix-framework"></i></a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item" href="#"><i class="nav-icon fab fa-phoenix-framework"></i></a>-->
+                                                </div>
+                                            </button>
+                                        </div>
+
+
+                                    </td>
                                 </tr>
                             <?php } ?>
                         </tbody>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/var/www/html/myjira/app/Console/Kernel.php</file>
+            <file>file:/var/www/html/myjira/resources/views/dashboard/issues/issueListing.blade.php</file>
+            <file>file:/var/www/html/myjira/resources/views/dashboard/issues/viewIssue.blade.php</file>
+            <file>file:/var/www/html/myjira/app/Http/Controllers/Dashboard/Issues/IssuesController.php</file>
+            <file>file:/var/www/html/myjira/app/Console/Commands/IssueActionCommand.php</file>
+            <file>file:/var/www/html/myjira/app/Models/IssuesModel.php</file>
+            <file>file:/var/www/html/myjira/app/Models/IssuelinksModel.php</file>
+        </group>
+    </open-files>
+</project-private>
